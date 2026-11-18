@@ -41,7 +41,7 @@ export function Settings() {
   const trashed = items.filter((i) => i.trashed);
   const Row = ({ icon, title, body, children }: { icon: React.ReactNode; title: string; body?: string; children: React.ReactNode }) => (
     <div className="setting">
-      <span className="ficon sm" style={{ background: "var(--tint)", color: "var(--ember)" }}>{icon}</span>
+      <span className="set-ico">{icon}</span>
       <div className="grow">
         <div style={{ fontWeight: 600 }}>{title}</div>
         {body && <div className="meta">{body}</div>}
@@ -91,7 +91,7 @@ export function Settings() {
         <Row icon={<Smartphone size={16} />} title={standalone ? "Installed" : "Install Folio"} body={standalone ? "Running as an app. It opens offline and appears in your share sheet." : "Adds Folio to your home screen or Start menu, works offline, and shows up when you share or open documents."}>
           {!standalone && (
             <button
-              className="btn sm red"
+              className="btn sm"
               disabled={!canInstall}
               title={canInstall ? "" : "Use your browser's menu: Install app / Add to Home screen"}
               onClick={async () => {
@@ -110,15 +110,15 @@ export function Settings() {
             <button className="btn sm" onClick={() => (native!.checkForUpdate(), toast("Checking for updates…", "info"))}>Check now</button>
           </Row>
         )}
-        <Row icon={<HardDrive size={16} />} title="Storage on this device" body={`${humanSize(usage.used) || "0 B"} used${usage.quota ? ` of ${humanSize(usage.quota)} available` : ""}. ${usage.persisted ? "Protected from automatic clean-up." : "The browser may clear it if space runs very low — keep a backup."}`}>
-          <span className="badge green">{items.length} items</span>
+        <Row icon={<HardDrive size={16} />} title="Storage on this device" body={`${humanSize(usage.used) || "0 B"} used${usage.quota ? ` of ${humanSize(usage.quota)} available` : ""}. ${usage.persisted ? "Protected from automatic clean-up." : `${native ? "Kept inside the app; uninstalling Folio removes it" : "The browser may clear it if space runs very low"} — keep a backup.`}`}>
+          <span className="meta">{items.length} item{items.length === 1 ? "" : "s"}</span>
         </Row>
       </div>
 
       <div className="overline" style={{ margin: "26px 0 8px" }}>Your data</div>
       <div className="card">
         <Row icon={<DatabaseBackup size={16} />} title="Back up everything" body="Every document, note, sheet and file in one file. Keep it somewhere safe, or move it to another device.">
-          <button className="btn sm green" onClick={async () => (download(await backup(), `Folio backup ${new Date().toISOString().slice(0, 10)}.json`), toast("Backup saved"))}>
+          <button className="btn sm" onClick={async () => (download(await backup(), `Folio backup ${new Date().toISOString().slice(0, 10)}.json`), toast("Backup saved"))}>
             <Download size={15} /> Back up
           </button>
           <button className="btn sm" onClick={() => restoreInput.current?.click()}><Upload size={15} /> Restore</button>
@@ -167,8 +167,8 @@ export function Settings() {
         </Row>
       </div>
 
-      <div className="overline" style={{ margin: "26px 0 8px" }}>Keyboard</div>
-      <div className="card" style={{ padding: "6px 0" }}>
+      <div className="overline hide-sm" style={{ margin: "26px 0 8px" }}>Keyboard</div>
+      <div className="card hide-sm" style={{ padding: "6px 0" }}>
         {[
           ["Open a file", "Ctrl O"],
           ["New document", "Ctrl Alt N"],

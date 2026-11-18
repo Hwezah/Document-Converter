@@ -606,3 +606,8 @@ a { color: inherit; }
 
 /* Inside the Android app: a little room under the notch / status bar. */
 :root.android #root { padding-top: 6px; box-sizing: border-box; }
+
+/* Settings: quiet greys only; colour is kept for the accent choice and for danger. */
+.set-ico { width: 30px; height: 30px; flex: none; display: grid; place-items: center; color: var(--muted); }
+.set-ico svg { width: 18px; height: 18px; }
+.card .btn.danger { color: var(--danger); }
