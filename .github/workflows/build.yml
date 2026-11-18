@@ -1,0 +1,85 @@
+name: Build
+
+# On every push to main: type-check and build the web app, wrap it in the Android app,
+# and publish Folio.apk on the fixed "folio-latest" pre-release, so one link always has the newest build.
+
+on:
+  push:
+    branches: ["main"]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: build-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Build the web app
+        run: |
+          npm ci
+          npm run build
+
+      - name: Put it inside the Android app
+        run: |
+          rm -rf android/app/src/main/assets/www
+          mkdir -p android/app/src/main/assets
+          cp -r dist android/app/src/main/assets/www
+          # The service worker is for browsers; the app serves its files itself.
+          rm -f android/app/src/main/assets/www/sw.js android/app/src/main/assets/www/registerSW.js
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+
+      - uses: gradle/actions/setup-gradle@v4
+
+      - name: Accept Android SDK licences
+        run: yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --licenses > /dev/null
+
+      - name: Build the APK
+        working-directory: android
+        run: |
+          chmod +x gradlew
+          ./gradlew --no-daemon assembleRelease
+          mkdir -p ../out
+          cp app/build/outputs/apk/release/app-release.apk ../out/Folio.apk
+          ls -lh ../out
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Folio-apk
+          path: out/Folio.apk
+          if-no-files-found: error
+
+      - name: Publish to the folio-latest pre-release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        shell: bash
+        run: |
+          notes="Latest build from \`${GITHUB_REF_NAME}\` at ${GITHUB_SHA::7}, built $(date -u '+%Y-%m-%d %H:%M UTC'), versionCode $((100 + GITHUB_RUN_NUMBER)). On your phone: download **Folio.apk** and open it. Each build installs over the last and keeps your documents."
+          if gh release view folio-latest > /dev/null 2>&1; then
+            gh api -X PATCH "repos/$GH_REPO/git/refs/tags/folio-latest" -f sha="$GITHUB_SHA" -F force=true > /dev/null
+            for name in $(gh release view folio-latest --json assets -q '.assets[].name'); do
+              gh release delete-asset folio-latest "$name" --yes
+            done
+            gh release upload folio-latest out/Folio.apk --clobber
+            gh release edit folio-latest --notes "$notes" --prerelease --target "$GITHUB_SHA"
+          else
+            gh release create folio-latest out/Folio.apk --prerelease --title "Folio — latest build" --notes "$notes" --target "$GITHUB_SHA"
+          fi

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Grabber's red glow: deep red rising to ember at the bottom right. -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <gradient
+        android:type="radial"
+        android:centerX="0.85"
+        android:centerY="1.1"
+        android:gradientRadius="140dp"
+        android:startColor="#E35E3C"
+        android:centerColor="#B81D24"
+        android:endColor="#651014" />
+</shape>
