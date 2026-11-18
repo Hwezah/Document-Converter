@@ -1,13 +1,13 @@
 <h1 align="center">Folio</h1>
 
 <p align="center"><b>Convert, open, edit and write documents — and take notes.</b><br>
-On your Android phone, or in any browser. Everything stays on your device; nothing is uploaded.<br>
-In the family of WatchHub and Grabber, and wearing the same look.</p>
+On your Android phone, or in any browser. Everything stays on your device; nothing is uploaded.</p>
 
 ## Install on Android
 
 Open the **[folio-latest](../../releases/tag/folio-latest)** release on your phone, download **`Folio.apk`** and open it
-(allow "install unknown apps" for your browser or Files app when asked). Each new build installs over the last and keeps your documents.
+(allow "install unknown apps" for your browser or Files app when asked). You only do this once: after that, Folio checks for a
+new build every time it opens, downloads it, and asks to install it. Updates keep your documents.
 
 Once installed, Folio appears in **Open with** and **Share** for PDFs, Word, OpenDocument, EPUB, spreadsheets, text and pictures —
 so a document Grabber downloads opens straight in Folio.

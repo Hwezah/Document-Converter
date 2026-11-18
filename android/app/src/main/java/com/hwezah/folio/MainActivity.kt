@@ -22,6 +22,10 @@ import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.FileProvider
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowCompat
+import androidx.core.view.WindowInsetsCompat
+import android.widget.FrameLayout
 import androidx.webkit.WebViewAssetLoader
 import org.json.JSONArray
 import org.json.JSONObject
@@ -34,6 +38,8 @@ import java.io.File
  */
 class MainActivity : AppCompatActivity() {
     private lateinit var web: WebView
+    private lateinit var root: FrameLayout
+    private lateinit var updater: Updater
     private val origin = "https://appassets.androidplatform.net"
     private var filePathCallback: ValueCallback<Array<Uri>>? = null
     private var cameraUri: Uri? = null
@@ -68,6 +74,9 @@ class MainActivity : AppCompatActivity() {
     @SuppressLint("SetJavaScriptEnabled")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        updater = Updater(this)
+        // Draw edge to edge, then keep the page clear of the status bar, notch, navigation bar and keyboard.
+        WindowCompat.setDecorFitsSystemWindows(window, false)
         val loader = WebViewAssetLoader.Builder()
             .addPathHandler("/assets/", WebViewAssetLoader.AssetsPathHandler(this))
             .build()
@@ -122,7 +131,18 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         }
-        setContentView(web)
+        root = FrameLayout(this).apply {
+            setBackgroundColor(0xFF0A0A0A.toInt())
+            addView(web, FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT))
+        }
+        ViewCompat.setOnApplyWindowInsetsListener(root) { v, insets ->
+            val bars = insets.getInsets(WindowInsetsCompat.Type.systemBars() or WindowInsetsCompat.Type.displayCutout())
+            val ime = insets.getInsets(WindowInsetsCompat.Type.ime())
+            v.setPadding(bars.left, bars.top, bars.right, maxOf(bars.bottom, ime.bottom))
+            WindowInsetsCompat.CONSUMED
+        }
+        setContentView(root)
+        setDark(true)
 
         onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
@@ -133,6 +153,23 @@ class MainActivity : AppCompatActivity() {
         if (savedInstanceState != null) web.restoreState(savedInstanceState)
         else web.loadUrl("$origin/assets/www/index.html")
         handleIntent(intent)
+    }
+
+    override fun onResume() {
+        super.onResume()
+        updater.resume()
+        updater.check()
+    }
+
+    /** Status and navigation bars in the page's colour, with icons that read on it. */
+    private fun setDark(dark: Boolean) {
+        val color = if (dark) 0xFF0A0A0A.toInt() else 0xFFF6F2EE.toInt()
+        root.setBackgroundColor(color)
+        web.setBackgroundColor(color)
+        WindowCompat.getInsetsController(window, root).apply {
+            isAppearanceLightStatusBars = !dark
+            isAppearanceLightNavigationBars = !dark
+        }
     }
 
     override fun onNewIntent(intent: Intent) {
@@ -210,6 +247,15 @@ class MainActivity : AppCompatActivity() {
             pending.forEach { web.evaluateJavascript(it, null) }
             pending.clear()
         }
+
+        @JavascriptInterface
+        fun version(): String = "${updater.currentName}"
+
+        @JavascriptInterface
+        fun checkForUpdate() = updater.check(manual = true)
+
+        @JavascriptInterface
+        fun setDark(dark: Boolean) = runOnUiThread { this@MainActivity.setDark(dark) }
 
         /** Saves to the phone's Downloads folder. */
         @JavascriptInterface

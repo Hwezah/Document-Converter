@@ -1,9 +1,11 @@
 import { useEffect, useRef, useState } from "react";
-import { DatabaseBackup, Download, HardDrive, Monitor, Moon, Smartphone, Sun, Trash2, Upload, ShieldCheck, Keyboard } from "lucide-react";
+import { DatabaseBackup, Download, HardDrive, Monitor, Moon, Palette, RefreshCw, Smartphone, Trash2, Upload, ShieldCheck, Keyboard } from "lucide-react";
 import { backup, pref, remove, restoreBackup, setPref, useItems, wipe } from "../lib/store";
 import { download } from "../lib/exporters";
 import { humanSize } from "../lib/formats";
-import { getTheme, setTheme, type ThemePref } from "../lib/theme";
+import { ACCENTS, getAccent, getTheme, onAccent, setAccent, setTheme, type ThemePref } from "../lib/theme";
+import { Choice } from "../ui/kit";
+import { native } from "../lib/native";
 import { useConfirm, useToast } from "../ui/kit";
 
 type InstallEvent = Event & { prompt(): Promise<void>; userChoice: Promise<{ outcome: string }> };
@@ -18,6 +20,7 @@ export function Settings() {
   const toast = useToast();
   const confirm = useConfirm();
   const [theme, setT] = useState<ThemePref>(getTheme());
+  const [accent, setAcc] = useState(getAccent());
   const [docFmt, setDocFmt] = useState(() => pref("export.doc", "pdf"));
   const [paper, setPaper] = useState(() => pref("editor.paper", true));
   const [usage, setUsage] = useState<{ used?: number; quota?: number; persisted?: boolean }>({});
@@ -54,17 +57,26 @@ export function Settings() {
 
       <div className="overline" style={{ margin: "0 0 8px" }}>Look</div>
       <div className="card">
-        <Row icon={<Moon size={16} />} title="Theme" body="Dark like WatchHub, warm paper in the light.">
-          <div className="seg">
-            {([["system", <Monitor size={14} key="m" />, "Auto"], ["dark", <Moon size={14} key="d" />, "Dark"], ["light", <Sun size={14} key="l" />, "Light"]] as const).map(([v, ic, l]) => (
-              <button key={v} className={theme === v ? "on" : ""} onClick={() => (setTheme(v), setT(v))}>{ic} {l}</button>
-            ))}
-          </div>
+        <Row icon={<Moon size={16} />} title="Theme" body="Near-black, or warm paper in the light.">
+          <Choice label="Theme" value={theme} onChange={(v) => (setTheme(v), setT(v))} options={[{ value: "system", label: "Auto" }, { value: "dark", label: "Dark" }, { value: "light", label: "Light" }]} />
         </Row>
         <Row icon={<Monitor size={16} />} title="Documents open in" body="Page view shows paper; continuous is easier on phones.">
-          <div className="seg">
-            <button className={paper ? "on" : ""} onClick={() => (setPaper(true), setPref("editor.paper", true))}>Page</button>
-            <button className={!paper ? "on" : ""} onClick={() => (setPaper(false), setPref("editor.paper", false))}>Continuous</button>
+          <Choice label="Documents open in" value={paper ? "page" : "flow"} onChange={(v) => (setPaper(v === "page"), setPref("editor.paper", v === "page"))} options={[{ value: "page", label: "Page" }, { value: "flow", label: "Continuous" }]} />
+        </Row>
+        <Row icon={<Palette size={16} />} title="Accent" body="The colour of the main buttons, the current tab and choices.">
+          <div className="accents" role="radiogroup" aria-label="Accent">
+            {ACCENTS.map((a) => (
+              <button
+                key={a.hex}
+                role="radio"
+                aria-checked={accent === a.hex}
+                aria-label={a.name}
+                title={a.name}
+                className={accent === a.hex ? "on" : ""}
+                style={{ background: a.hex, "--on": onAccent(a.hex) } as React.CSSProperties}
+                onClick={() => (setAccent(a.hex), setAcc(a.hex))}
+              />
+            ))}
           </div>
         </Row>
         <Row icon={<Download size={16} />} title="Share documents as" body="What the share button in the editor sends.">
@@ -79,7 +91,7 @@ export function Settings() {
         <Row icon={<Smartphone size={16} />} title={standalone ? "Installed" : "Install Folio"} body={standalone ? "Running as an app. It opens offline and appears in your share sheet." : "Adds Folio to your home screen or Start menu, works offline, and shows up when you share or open documents."}>
           {!standalone && (
             <button
-              className="btn sm red grain"
+              className="btn sm red"
               disabled={!canInstall}
               title={canInstall ? "" : "Use your browser's menu: Install app / Add to Home screen"}
               onClick={async () => {
@@ -93,6 +105,11 @@ export function Settings() {
             </button>
           )}
         </Row>
+        {native && (
+          <Row icon={<RefreshCw size={16} />} title="Updates" body={`Version ${native.version()}. Folio checks for a new build each time it opens and offers to install it.`}>
+            <button className="btn sm" onClick={() => (native!.checkForUpdate(), toast("Checking for updates…", "info"))}>Check now</button>
+          </Row>
+        )}
         <Row icon={<HardDrive size={16} />} title="Storage on this device" body={`${humanSize(usage.used) || "0 B"} used${usage.quota ? ` of ${humanSize(usage.quota)} available` : ""}. ${usage.persisted ? "Protected from automatic clean-up." : "The browser may clear it if space runs very low — keep a backup."}`}>
           <span className="badge green">{items.length} items</span>
         </Row>
@@ -101,7 +118,7 @@ export function Settings() {
       <div className="overline" style={{ margin: "26px 0 8px" }}>Your data</div>
       <div className="card">
         <Row icon={<DatabaseBackup size={16} />} title="Back up everything" body="Every document, note, sheet and file in one file. Keep it somewhere safe, or move it to another device.">
-          <button className="btn sm green grain" onClick={async () => (download(await backup(), `Folio backup ${new Date().toISOString().slice(0, 10)}.json`), toast("Backup saved"))}>
+          <button className="btn sm green" onClick={async () => (download(await backup(), `Folio backup ${new Date().toISOString().slice(0, 10)}.json`), toast("Backup saved"))}>
             <Download size={15} /> Back up
           </button>
           <button className="btn sm" onClick={() => restoreInput.current?.click()}><Upload size={15} /> Restore</button>
@@ -172,7 +189,7 @@ export function Settings() {
       <p className="meta faint" style={{ textAlign: "center", marginTop: 34, lineHeight: 1.7 }}>
         Folio 1.0 · Everything is processed and stored on this device; nothing is uploaded.
         <br />
-        In the family of WatchHub and Grabber. Type: Google Sans Flex (SIL Open Font License).
+        Type: Google Sans Flex (SIL Open Font License).
       </p>
     </>
   );

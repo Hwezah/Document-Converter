@@ -45,20 +45,20 @@ export function Home() {
       </div>
 
       <div className="quick">
-        <button className="qtile glow-red grain" onClick={() => app.newDoc()}>
-          <span className="ico"><FilePlus2 size={22} /></span>
+        <button className="qtile fill red" onClick={() => app.newDoc()}>
+          <span className="ficon"><FilePlus2 size={22} /></span>
           <span><b>New document</b><small>Write, format, export anywhere</small></span>
         </button>
-        <button className="qtile plain grain" onClick={app.pickFiles}>
-          <span className="ico"><FolderOpen size={22} /></span>
+        <button className="qtile" onClick={app.pickFiles}>
+          <span className="ficon"><FolderOpen size={22} /></span>
           <span><b>Open a file</b><small>From Downloads or anywhere</small></span>
         </button>
-        <button className="qtile glow-orange grain" onClick={() => app.go("convert")}>
-          <span className="ico"><ArrowLeftRight size={22} /></span>
+        <button className="qtile fill orange" onClick={() => app.go("convert")}>
+          <span className="ficon"><ArrowLeftRight size={22} /></span>
           <span><b>Convert</b><small>PDF, Word, Markdown, Excel…</small></span>
         </button>
-        <button className="qtile glow-green grain" onClick={() => app.newNote()}>
-          <span className="ico"><StickyNote size={22} /></span>
+        <button className="qtile fill green" onClick={() => app.newNote()}>
+          <span className="ficon"><StickyNote size={22} /></span>
           <span><b>Quick note</b><small>Jot it down, sort it later</small></span>
         </button>
       </div>
@@ -85,7 +85,7 @@ export function Home() {
         <div className="grid-docs">{recent.map((i) => <DocCard key={i.id} item={i} onMenu={onMenu} />)}</div>
       ) : (
         <div className="drop" onClick={app.pickFiles} style={{ cursor: "pointer" }}>
-          <div className="big grain glow-red"><Upload size={26} /></div>
+          <div className="ficon lg red"><Upload size={26} /></div>
           <h3 className="title">Open your first document</h3>
           <p className="body" style={{ margin: "6px 0 0" }}>Drop a file here, paste one, or tap to pick from your Downloads.</p>
           <p className="meta faint" style={{ marginTop: 10 }}>PDF · DOCX · ODT · RTF · MD · TXT · HTML · EPUB · PPTX · XLSX · CSV · images</p>
@@ -114,7 +114,7 @@ export function Home() {
         </div>
       ) : (
         <Empty icon={<StickyNote size={28} />} tone="green" title="No notes yet" body="Ideas, lists, things to remember. Colour them, pin them, tick them off.">
-          <button className="btn green grain" onClick={() => app.newNote()}>Take a note</button>
+          <button className="btn green" onClick={() => app.newNote()}>Take a note</button>
         </Empty>
       )}
 

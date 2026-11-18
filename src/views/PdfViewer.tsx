@@ -246,7 +246,7 @@ export function PdfViewer({ item }: { item: Item }) {
             <button className="zoom btn sm ghost hide-sm" title="Fit width" onClick={() => setZoom(1)}>{Math.round(zoom * 100)}%</button>
             <button className="btn sm icon ghost hide-sm" aria-label="Zoom in" onClick={() => setZoom((z) => Math.min(4, z + 0.25))}><Plus size={16} /></button>
             <button className="btn sm icon ghost" aria-label="Search" onClick={() => setFinding((f) => !f)}><Search size={17} /></button>
-            <button className="btn sm red grain" onClick={toDoc} disabled={!!busy}><FilePen size={15} /> <span className="hide-sm">Edit as document</span></button>
+            <button className="btn sm red" onClick={toDoc} disabled={!!busy}><FilePen size={15} /> <span className="hide-sm">Edit as document</span></button>
           </>
         )}
         <button
@@ -272,7 +272,7 @@ export function PdfViewer({ item }: { item: Item }) {
         <div className="findbar glass">
           <form className="row grow" onSubmit={(e) => (e.preventDefault(), search())}>
             <input className="input" autoFocus placeholder="Search this PDF" value={term} onChange={(e) => setTerm(e.target.value)} />
-            <button className="btn sm orange grain" type="submit">Find</button>
+            <button className="btn sm orange" type="submit">Find</button>
           </form>
           <span className="meta">{applied ? (results.length ? `On ${results.length} page${results.length > 1 ? "s" : ""}` : "No match") : ""}</span>
           <button className="btn sm icon ghost" aria-label="Close search" onClick={() => (setFinding(false), setApplied(""), setResults([]))}><X size={16} /></button>
@@ -288,9 +288,9 @@ export function PdfViewer({ item }: { item: Item }) {
           <div className="empty"><h3 className="title">Couldn't open this PDF</h3><p className="body">{error}</p></div>
         ) : locked ? (
           <div className="empty">
-            <div className="big grain glow-orange"><Lock size={26} /></div>
+            <div className="ficon lg orange"><Lock size={26} /></div>
             <h3 className="title">This PDF is password-protected</h3>
-            <button className="btn orange grain mt" onClick={() => load()}>Enter password</button>
+            <button className="btn orange mt" onClick={() => load()}>Enter password</button>
           </div>
         ) : !doc ? (
           <div className="loading"><Spinner /></div>

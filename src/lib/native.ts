@@ -3,6 +3,9 @@ interface Bridge {
   ready(): void;
   save(name: string, mime: string, base64: string): void;
   share(name: string, mime: string, base64: string): void;
+  version(): string;
+  checkForUpdate(): void;
+  setDark?(dark: boolean): void;
 }
 
 export const native: Bridge | undefined = (window as unknown as { FolioAndroid?: Bridge }).FolioAndroid;

@@ -147,14 +147,14 @@ export function Editor({ item }: { item: Item }) {
     <div className={`editor-wrap ${focus ? "focus-mode" : ""}`}>
       <div className="ed-top glass">
         <button className="btn icon ghost" aria-label="Back" onClick={() => flush().then(app.close)}><ArrowLeft size={19} /></button>
-        <span className="ficon sm grain glow-red"><FileText size={15} /></span>
+        <span className="ficon sm red"><FileText size={15} /></span>
         <input className="ed-title" value={title} aria-label="Title" onChange={(e) => setTitle(e.target.value)} onBlur={saveTitle} onKeyDown={(e) => e.key === "Enter" && (e.target as HTMLInputElement).blur()} />
         <span className={`saved ${dirty ? "dirty" : ""}`} title={dirty ? "Saving…" : "Saved on this device"}>
           <span className="dot" /> <span className="hide-sm">{dirty ? "Saving" : `Saved ${ago(savedAt)}`}</span>
         </span>
         <button className="btn sm icon ghost" aria-label="Find" title="Find (Ctrl+F)" onClick={() => setFinding((f) => !f)}><Search size={17} /></button>
         {("share" in navigator || "FolioAndroid" in window) && <button className="btn sm icon ghost" aria-label="Share" onClick={share}><Share2 size={17} /></button>}
-        <button className="btn sm orange grain" onClick={() => flush().then(() => setExporting(true))}><Download size={15} /> <span>Export</span></button>
+        <button className="btn sm orange" onClick={() => flush().then(() => setExporting(true))}><Download size={15} /> <span>Export</span></button>
         <button className="btn sm icon ghost" aria-label="More" onClick={more}><MoreVertical size={18} /></button>
       </div>
       <Toolbar editor={editor} />

@@ -5,7 +5,7 @@ import { remove, useItems, getBlob, type Item } from "../lib/store";
 import { ago, familyOf, humanSize } from "../lib/formats";
 import { DocCard, useItemActions } from "../ui/Cards";
 import { ExportDialog } from "../ui/ExportDialog";
-import { Empty, ItemIcon, kindLabel, useConfirm, useMenu, useToast } from "../ui/kit";
+import { Choice, Empty, ItemIcon, kindLabel, useConfirm, useMenu, useToast } from "../ui/kit";
 import { pref, setPref } from "../lib/store";
 import { download, zipFiles } from "../lib/exporters";
 import { exportItem } from "../lib/itemio";
@@ -111,7 +111,7 @@ export function Files() {
           ) : (
             <>
               <button className="btn sm" onClick={() => setSel(new Set())}><CheckSquare size={15} /> Select</button>
-              <button className="btn sm red grain" onClick={app.pickFiles}><Upload size={15} /> Open</button>
+              <button className="btn sm red" onClick={app.pickFiles}><Upload size={15} /> Open</button>
             </>
           )}
         </div>
@@ -128,15 +128,15 @@ export function Files() {
           <option value="name">Name</option>
           <option value="size">Size</option>
         </select>
-        <div className="seg" role="group" aria-label="Layout">
-          <button className={layout === "grid" ? "on" : ""} onClick={() => (setLayout("grid"), setPref("files.layout", "grid"))} aria-label="Grid"><LayoutGrid size={15} /></button>
-          <button className={layout === "list" ? "on" : ""} onClick={() => (setLayout("list"), setPref("files.layout", "list"))} aria-label="List"><List size={15} /></button>
-        </div>
+        <Choice
+          label="Layout"
+          value={layout}
+          onChange={(v) => (setLayout(v), setPref("files.layout", v))}
+          options={[{ value: "grid", label: <><LayoutGrid size={15} /> Grid</> }, { value: "list", label: <><List size={15} /> List</> }]}
+        />
       </div>
-      <div className="chips mt">
-        {FILTERS.map((f) => (
-          <button key={f.id} className={`chip ${filter === f.id ? "on" : ""}`} onClick={() => setFilter(f.id)}>{f.label}</button>
-        ))}
+      <div className="mt">
+        <Choice label="Show" value={filter} onChange={setFilter} options={FILTERS.map((f) => ({ value: f.id, label: f.label }))} />
       </div>
 
       <div className="mt-lg">
@@ -145,13 +145,13 @@ export function Files() {
             <Empty icon={<Trash2 size={28} />} tone="orange" title="Trash is empty" body="Deleted files wait here for 30 days." />
           ) : (
             <Empty icon={<Library size={28} />} title={q ? "Nothing matches" : "Nothing here yet"} body={q ? "Try another word." : "Open a file from your Downloads, or create something new."}>
-              {!q && <button className="btn red grain" onClick={app.pickFiles}><Upload size={16} /> Open a file</button>}
+              {!q && <button className="btn red" onClick={app.pickFiles}><Upload size={16} /> Open a file</button>}
             </Empty>
           )
         ) : layout === "grid" ? (
           <div className="grid-docs">
             {list.map((i) => (
-              <div key={i.id} style={sel?.has(i.id) ? { outline: "2px solid var(--orange)", borderRadius: 14 } : undefined} onClickCapture={(e) => sel && (e.stopPropagation(), toggle(i.id))}>
+              <div key={i.id} className={sel?.has(i.id) ? "picked" : undefined} onClickCapture={(e) => sel && (e.stopPropagation(), toggle(i.id))}>
                 <DocCard item={i} onMenu={onMenu} />
               </div>
             ))}
@@ -161,10 +161,9 @@ export function Files() {
             {list.map((i) => (
               <div
                 key={i.id}
-                className="li"
+                className={`li ${sel?.has(i.id) ? "sel" : ""}`}
                 role="button"
                 tabIndex={0}
-                style={sel?.has(i.id) ? { background: "var(--orange-soft)" } : undefined}
                 onClick={() => (sel ? toggle(i.id) : !i.trashed && app.open(i.id))}
                 onContextMenu={(e) => onMenu(e, i)}
               >

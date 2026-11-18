@@ -7,19 +7,19 @@ import { create, getBlob, useItems, type Item } from "../lib/store";
 import { baseName, humanSize } from "../lib/formats";
 import { imagesToPdf, mergePdfs, openPdf, rebuildPdf, renderPage, setPdfInfo, splitPdf, stampPdf, pdfToHtml, type PDFDocumentProxy } from "../lib/pdf";
 import { download, zipFiles } from "../lib/exporters";
-import { FileBadge, Modal, Spinner, useToast } from "../ui/kit";
+import { Choice, FileBadge, Modal, Spinner, useToast } from "../ui/kit";
 
 type ToolId = "organize" | "merge" | "split" | "scan" | "images" | "watermark" | "numbers" | "info" | "text";
 const TOOLS: { id: ToolId; title: string; body: string; icon: ReactNode; color: string }[] = [
-  { id: "organize", title: "Organize pages", body: "Reorder, rotate, delete or pull out pages", icon: <LayoutGrid size={20} />, color: "glow-orange" },
-  { id: "merge", title: "Merge PDFs", body: "Several PDFs into one, in your order", icon: <FileStack size={20} />, color: "glow-red" },
-  { id: "split", title: "Split PDF", body: "By page ranges, like 1-3, 5, 8-", icon: <Scissors size={20} />, color: "glow-orange" },
-  { id: "scan", title: "Scan to PDF", body: "Photograph pages with your camera", icon: <Camera size={20} />, color: "glow-green" },
-  { id: "images", title: "Pictures to PDF", body: "Photos and screenshots, one per page", icon: <ImagePlus size={20} />, color: "glow-green" },
-  { id: "text", title: "PDF to editable text", body: "Pull the words out to edit them", icon: <FilePen size={20} />, color: "glow-red" },
-  { id: "watermark", title: "Watermark", body: "Stamp DRAFT, CONFIDENTIAL, your name…", icon: <Stamp size={20} />, color: "glow-orange" },
-  { id: "numbers", title: "Page numbers", body: "Number every page at the bottom", icon: <Hash size={20} />, color: "glow-red" },
-  { id: "info", title: "Title & author", body: "Change what a PDF says about itself", icon: <Info size={20} />, color: "glow-ink" },
+  { id: "organize", title: "Organize pages", body: "Reorder, rotate, delete or pull out pages", icon: <LayoutGrid size={20} />, color: "orange" },
+  { id: "merge", title: "Merge PDFs", body: "Several PDFs into one, in your order", icon: <FileStack size={20} />, color: "red" },
+  { id: "split", title: "Split PDF", body: "By page ranges, like 1-3, 5, 8-", icon: <Scissors size={20} />, color: "orange" },
+  { id: "scan", title: "Scan to PDF", body: "Photograph pages with your camera", icon: <Camera size={20} />, color: "green" },
+  { id: "images", title: "Pictures to PDF", body: "Photos and screenshots, one per page", icon: <ImagePlus size={20} />, color: "green" },
+  { id: "text", title: "PDF to editable text", body: "Pull the words out to edit them", icon: <FilePen size={20} />, color: "red" },
+  { id: "watermark", title: "Watermark", body: "Stamp DRAFT, CONFIDENTIAL, your name…", icon: <Stamp size={20} />, color: "orange" },
+  { id: "numbers", title: "Page numbers", body: "Number every page at the bottom", icon: <Hash size={20} />, color: "red" },
+  { id: "info", title: "Title & author", body: "Change what a PDF says about itself", icon: <Info size={20} />, color: "grey" },
 ];
 
 export function Tools() {
@@ -32,7 +32,7 @@ export function Tools() {
       <div className="tools">
         {TOOLS.map((t) => (
           <button key={t.id} className="tool" onClick={() => setTool(t.id)}>
-            <span className={`ficon grain ${t.color}`}>{t.icon}</span>
+            <span className={`ficon ${t.color}`}>{t.icon}</span>
             <span>
               <b className="title" style={{ fontSize: 16 }}>{t.title}</b>
               <br />
@@ -62,7 +62,7 @@ function PickPdf({ onPick, multiple }: { onPick: (s: Src[]) => void; multiple?: 
   };
   return (
     <>
-      <button className="btn orange grain wide" onClick={() => input.current?.click()}><Upload size={17} /> Choose {multiple ? "PDFs" : "a PDF"} from this device</button>
+      <button className="btn orange wide" onClick={() => input.current?.click()}><Upload size={17} /> Choose {multiple ? "PDFs" : "a PDF"} from this device</button>
       <input
         ref={input}
         type="file"
@@ -121,7 +121,7 @@ function Result({ files, onDone }: { files: { name: string; blob: Blob }[]; onDo
           <Library size={16} /> Keep in library
         </button>
         <button
-          className="btn green grain"
+          className="btn green"
           onClick={async () => {
             if (files.length === 1) download(files[0].blob, files[0].name);
             else download(await zipFiles(files), "PDFs.zip");
@@ -237,7 +237,7 @@ function Organize({ onClose }: { onClose: () => void }) {
           <div className="row mt" style={{ justifyContent: "flex-end" }}>
             {busy && <Spinner />}
             <button className="btn" disabled={!sel || busy} onClick={() => save("selected")}>Extract {sel || ""} selected</button>
-            <button className="btn orange grain" disabled={busy} onClick={() => save()}>Save {pages.filter((p) => !p.deleted).length} pages</button>
+            <button className="btn orange" disabled={busy} onClick={() => save()}>Save {pages.filter((p) => !p.deleted).length} pages</button>
           </div>
         </>
       )}
@@ -283,7 +283,7 @@ function Merge({ onClose }: { onClose: () => void }) {
           <div className="row mt" style={{ justifyContent: "flex-end" }}>
             {busy && <Spinner />}
             <button
-              className="btn red grain"
+              className="btn red"
               disabled={list.length < 2 || busy}
               onClick={async () => {
                 setBusy(true);
@@ -337,7 +337,7 @@ function ToPdf({ camera, onClose }: { camera: boolean; onClose: () => void }) {
                 </div>
               </div>
             ))}
-            <button className="pg" style={{ display: "grid", placeItems: "center", minHeight: 160, border: "1.5px dashed var(--stroke)", background: "none" }} onClick={() => input.current?.click()}>
+            <button className="pg add" onClick={() => input.current?.click()}>
               <span className="col" style={{ alignItems: "center", color: "var(--muted)" }}>
                 {camera ? <Camera size={26} /> : <Images size={26} />}
                 <b>{camera ? (imgs.length ? "Next page" : "Take a photo") : "Add pictures"}</b>
@@ -347,13 +347,11 @@ function ToPdf({ camera, onClose }: { camera: boolean; onClose: () => void }) {
           <input ref={input} type="file" accept="image/*" multiple={!camera} capture={camera ? "environment" : undefined} hidden onChange={(e) => (add([...(e.target.files ?? [])]), (e.target.value = ""))} />
           <div className="row wrap" style={{ justifyContent: "flex-end" }}>
             <span className="meta">Page size</span>
-            <div className="seg">
-              {(["a4", "letter", "fit"] as const).map((s) => <button key={s} className={size === s ? "on" : ""} onClick={() => setSize(s)}>{s === "fit" ? "Fit picture" : s.toUpperCase()}</button>)}
-            </div>
+            <Choice label="Page size" value={size} onChange={setSize} options={[{ value: "a4", label: "A4" }, { value: "letter", label: "Letter" }, { value: "fit", label: "Fit picture" }]} />
             <span className="grow" />
             {busy && <Spinner />}
             <button
-              className="btn green grain"
+              className="btn green"
               disabled={!imgs.length || busy}
               onClick={async () => {
                 setBusy(true);
@@ -476,7 +474,7 @@ function OneShot({ tool, onClose }: { tool: "split" | "watermark" | "numbers" | 
           )}
           <div className="row" style={{ justifyContent: "flex-end" }}>
             {busy && <Spinner />}
-            <button className="btn orange grain" disabled={!!busy} onClick={go}>{meta.icon} {meta.title}</button>
+            <button className="btn orange" disabled={!!busy} onClick={go}>{meta.icon} {meta.title}</button>
           </div>
         </div>
       )}

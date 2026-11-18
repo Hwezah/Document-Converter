@@ -127,11 +127,11 @@ export function Convert() {
           add([...e.dataTransfer.files]);
         }}
       >
-        <div className="big grain glow-orange"><ArrowLeftRight size={26} /></div>
+        <div className="ficon lg orange"><ArrowLeftRight size={26} /></div>
         <h3 className="title">Drop files to convert</h3>
         <p className="body" style={{ margin: "6px 0 14px" }}>Or pick several at once from your Downloads.</p>
         <div className="row" style={{ justifyContent: "center" }}>
-          <button className="btn orange grain" onClick={() => input.current?.click()}><Upload size={17} /> Choose files</button>
+          <button className="btn orange" onClick={() => input.current?.click()}><Upload size={17} /> Choose files</button>
         </div>
         <input ref={input} type="file" multiple accept={ACCEPT} hidden onChange={(e) => (add([...(e.target.files ?? [])]), (e.target.value = ""))} />
       </div>
@@ -183,7 +183,7 @@ export function Convert() {
                 </select>
                 {j.state === "working" && <Spinner />}
                 {j.state === "done" && (j.out?.length ? (
-                  <button className="btn sm green grain" onClick={async () => (j.out!.length === 1 ? download(j.out![0].blob, j.out![0].name) : download(await zipFiles(j.out!), j.file.name.replace(/\.[^.]+$/, "") + ` (${j.target}).zip`))}>
+                  <button className="btn sm green" onClick={async () => (j.out!.length === 1 ? download(j.out![0].blob, j.out![0].name) : download(await zipFiles(j.out!), j.file.name.replace(/\.[^.]+$/, "") + ` (${j.target}).zip`))}>
                     <Download size={15} /> {j.out.length > 1 ? `${j.out.length} files` : "Save"}
                   </button>
                 ) : <Check size={18} style={{ color: "var(--green)" }} />)}
@@ -203,10 +203,10 @@ export function Convert() {
             {done.length > 0 && (
               <>
                 <button className="btn" onClick={toLibrary}><Library size={16} /> Keep in library</button>
-                <button className="btn green grain" onClick={downloadAll}><FolderInput size={16} /> Download {done.length > 1 ? `all (${done.length}) as ZIP` : "result"}</button>
+                <button className="btn green" onClick={downloadAll}><FolderInput size={16} /> Download {done.length > 1 ? `all (${done.length}) as ZIP` : "result"}</button>
               </>
             )}
-            <button className="btn orange grain" disabled={running || jobs.every((j) => j.state === "done")} onClick={run}>
+            <button className="btn orange" disabled={running || jobs.every((j) => j.state === "done")} onClick={run}>
               {running ? <Spinner /> : <ArrowLeftRight size={17} />} {running ? "Converting" : canCombine && combine ? "Combine" : `Convert ${jobs.filter((j) => j.state !== "done").length}`}
             </button>
           </div>

@@ -58,12 +58,21 @@ jobs:
           ./gradlew --no-daemon assembleRelease
           mkdir -p ../out
           cp app/build/outputs/apk/release/app-release.apk ../out/Folio.apk
+          # What the installed app reads to know there's an update (android/.../Updater.kt).
+          code=$((100 + GITHUB_RUN_NUMBER))
+          python3 - "$code" "$GITHUB_RUN_NUMBER" "${GITHUB_SHA::7}" "$(git log -1 --format=%s)" <<'PY'
+          import json, os, sys
+          code, run, sha, summary = sys.argv[1:]
+          info = {"versionCode": int(code), "versionName": f"1.0.0 (build {run})", "size": os.path.getsize("../out/Folio.apk"), "sha": sha, "summary": summary}
+          open("../out/version.json", "w").write(json.dumps(info) + "\n")
+          PY
+          cat ../out/version.json
           ls -lh ../out
 
       - uses: actions/upload-artifact@v4
         with:
           name: Folio-apk
-          path: out/Folio.apk
+          path: out/*
           if-no-files-found: error
 
       - name: Publish to the folio-latest pre-release
@@ -72,14 +81,14 @@ jobs:
           GH_REPO: ${{ github.repository }}
         shell: bash
         run: |
-          notes="Latest build from \`${GITHUB_REF_NAME}\` at ${GITHUB_SHA::7}, built $(date -u '+%Y-%m-%d %H:%M UTC'), versionCode $((100 + GITHUB_RUN_NUMBER)). On your phone: download **Folio.apk** and open it. Each build installs over the last and keeps your documents."
+          notes="Latest build from \`${GITHUB_REF_NAME}\` at ${GITHUB_SHA::7}, built $(date -u '+%Y-%m-%d %H:%M UTC'), versionCode $((100 + GITHUB_RUN_NUMBER)). On your phone: download **Folio.apk** and open it. Install once; after that Folio updates itself whenever it opens."
           if gh release view folio-latest > /dev/null 2>&1; then
             gh api -X PATCH "repos/$GH_REPO/git/refs/tags/folio-latest" -f sha="$GITHUB_SHA" -F force=true > /dev/null
             for name in $(gh release view folio-latest --json assets -q '.assets[].name'); do
               gh release delete-asset folio-latest "$name" --yes
             done
-            gh release upload folio-latest out/Folio.apk --clobber
+            gh release upload folio-latest out/Folio.apk out/version.json --clobber
             gh release edit folio-latest --notes "$notes" --prerelease --target "$GITHUB_SHA"
           else
-            gh release create folio-latest out/Folio.apk --prerelease --title "Folio — latest build" --notes "$notes" --target "$GITHUB_SHA"
+            gh release create folio-latest out/Folio.apk out/version.json --prerelease --title "Folio — latest build" --notes "$notes" --target "$GITHUB_SHA"
           fi

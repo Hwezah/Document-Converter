@@ -47,8 +47,9 @@ export function Notes() {
     const html = checklist
       ? `<ul data-type="taskList">${(text ? text.split(/\s*[,;]\s*/) : [""]).map((t) => `<li data-type="taskItem" data-checked="false"><p>${t.replace(/</g, "&lt;")}</p></li>`).join("")}</ul>`
       : text ? `<p>${text.replace(/</g, "&lt;")}</p>` : "";
-    const it = await create({ kind: "note", title: "", html, text, tint: tint === "all" ? null : tint, tags: tag ? [tag] : [] });
+    // Clear the box now, not after saving, so typing straight on isn't wiped.
     setCapture("");
+    const it = await create({ kind: "note", title: "", html, text, tint: tint === "all" ? null : tint, tags: tag ? [tag] : [] });
     if (!text || checklist) setEditing(it.id);
   };
 
@@ -78,11 +79,11 @@ export function Notes() {
         </div>
       </div>
 
-      <form className="capture glass grain mt-lg row" onSubmit={(e) => (e.preventDefault(), quickAdd())}>
+      <form className="capture mt-lg row" onSubmit={(e) => (e.preventDefault(), quickAdd())}>
         <StickyNote size={19} style={{ marginLeft: 10, color: "var(--green)", flex: "none" }} />
         <input placeholder="Take a note…" value={capture} onChange={(e) => setCapture(e.target.value)} aria-label="Take a note" />
         <button type="button" className="btn sm icon ghost" title="New checklist (comma-separated items)" aria-label="New checklist" onClick={() => quickAdd(true)}><ListChecks size={18} /></button>
-        <button type="submit" className="btn sm green grain" aria-label="Add note"><Plus size={16} /> Add</button>
+        <button type="submit" className="btn sm green" aria-label="Add note"><Plus size={16} /> Add</button>
       </form>
 
       <div className="row wrap" style={{ justifyContent: "center", marginBottom: 24, gap: 14 }}>
@@ -181,7 +182,7 @@ function NoteEditor({ id, onClose, onOpenDoc }: { id: string; onClose: () => voi
           </div>
         </>
       )}
-      <div className="row wrap" style={{ borderTop: "1px solid var(--stroke)", paddingTop: 14, gap: 12 }}>
+      <div className="row wrap" style={{ paddingTop: 14, gap: 12 }}>
         <div className="swatches" role="group" aria-label="Colour">
           {TINTS.map((t) => (
             <button key={String(t.id)} className={`swatch ${(cur.tint ?? null) === t.id ? "on" : ""}`} style={{ background: t.color }} aria-label={t.label} title={t.label} onClick={() => (patch(id, { tint: t.id }, false), rerender((n) => n + 1))} />

@@ -274,7 +274,6 @@ export function App() {
     const V = { home: Home, files: Files, notes: Notes, convert: Convert, tools: Tools, settings: Settings }[view] ?? Home;
     content = (
       <div className="page" key={view}>
-        <div className="ambient" />
         <div className="page-inner enter">{loaded ? <V /> : null}</div>
       </div>
     );
@@ -283,13 +282,13 @@ export function App() {
   return (
     <Ctx.Provider value={api}>
       <div className="shell">
-        <nav className="rail glass grain" aria-label="Main">
+        <nav className="rail" aria-label="Main">
           <div>
             <div className="brand">
               <img src="./icons/icon.svg" alt="" />
               <b>Folio</b>
             </div>
-            <button className="btn red wide newbtn grain" onClick={createMenu}>
+            <button className="btn red wide newbtn" onClick={createMenu}>
               <Plus size={18} /> New
             </button>
             {NAV.map((n) => (
@@ -297,6 +296,7 @@ export function App() {
                 {n.icon}
                 {n.label}
                 {counts[n.id] ? <span className="count">{counts[n.id]}</span> : null}
+                {view === n.id && !openItem && <span className="dot" />}
               </button>
             ))}
           </div>
@@ -337,8 +337,8 @@ export function App() {
       />
       {dragging && (
         <div className="dragover-all">
-          <div className="box glass grain">
-            <div className="big grain glow-red" style={{ width: 64, height: 64, borderRadius: 20, display: "grid", placeItems: "center", margin: "0 auto 14px", color: "#fff" }}>
+          <div className="box">
+            <div className="ficon lg red">
               <Upload size={28} />
             </div>
             <h2 className="title">Drop to open</h2>

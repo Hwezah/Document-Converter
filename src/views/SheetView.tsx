@@ -118,7 +118,7 @@ export function SheetView({ item }: { item: Item }) {
     <div className="viewer">
       <div className="vbar glass">
         <button className="btn icon ghost" aria-label="Back" onClick={() => (save(), app.close())}><ArrowLeft size={19} /></button>
-        <span className="ficon sm grain glow-green" style={{ fontSize: 9 }}>XLS</span>
+        <span className="ficon sm green" style={{ fontSize: 9 }}>XLS</span>
         <input className="ed-title" style={{ flex: 1 }} value={title} aria-label="Title" onChange={(e) => setTitle(e.target.value)} onBlur={() => title.trim() && patch(item.id, { title: title.trim() })} />
         <span className="saved hide-sm"><span className="dot" /> Saved {ago(savedAt)}</span>
         <div className="search hide-sm" style={{ width: 200 }}>
@@ -127,7 +127,7 @@ export function SheetView({ item }: { item: Item }) {
         </div>
         <button className="btn sm" onClick={() => setRows([...s.rows, Array(cols).fill("")])}><Rows3 size={15} /> <span className="hide-sm">Row</span></button>
         <button className="btn sm" onClick={() => setRows(s.rows.map((r) => [...r, ...Array(Math.max(0, cols - r.length)), ""]))}><Columns3 size={15} /> <span className="hide-sm">Column</span></button>
-        <button className="btn sm orange grain" onClick={() => (save(), setExporting(true))}><Download size={15} /> <span className="hide-sm">Export</span></button>
+        <button className="btn sm orange" onClick={() => (save(), setExporting(true))}><Download size={15} /> <span className="hide-sm">Export</span></button>
       </div>
       <div className="sheet-wrap">
         <table className="sheet">
@@ -164,10 +164,11 @@ export function SheetView({ item }: { item: Item }) {
         </table>
       </div>
       <div className="tabs glass">
+        <div className="ptabs">
         {sheets.map((sh, i) => (
           <button
             key={i}
-            className={`chip ${i === tab ? "on" : ""}`}
+            className={i === tab ? "on" : ""}
             onClick={() => setTab(i)}
             onDoubleClick={async () => {
               const n = await prompt({ title: "Rename sheet", value: sh.name, ok: "Rename" });
@@ -177,6 +178,7 @@ export function SheetView({ item }: { item: Item }) {
             {sh.name}
           </button>
         ))}
+        </div>
         <button className="chip" aria-label="Add sheet" onClick={() => (commit([...sheets, { name: `Sheet${sheets.length + 1}`, rows: Array.from({ length: 20 }, () => Array(6).fill("")) }]), setTab(sheets.length))}><Plus size={14} /></button>
         {sheets.length > 1 && (
           <button

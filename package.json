@@ -1,7 +1,7 @@
 {
   "name": "folio",
   "version": "1.0.0",
-  "description": "Folio: convert, open, edit and write documents. WatchHub and Grabber look.",
+  "description": "Folio: convert, open, edit and write documents, and take notes.",
   "scripts": {
     "dev": "vite",
     "build": "tsc --noEmit && vite build",

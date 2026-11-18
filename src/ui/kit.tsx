@@ -1,4 +1,4 @@
-import { createContext, useCallback, useContext, useEffect, useLayoutEffect, useRef, useState, type ReactNode } from "react";
+import { createContext, Fragment, useCallback, useContext, useEffect, useLayoutEffect, useRef, useState, type CSSProperties, type ReactNode } from "react";
 import { createPortal } from "react-dom";
 import { FileText, Image as ImageIcon, NotebookPen, Sheet, StickyNote } from "lucide-react";
 import { fmt } from "../lib/formats";
@@ -129,7 +129,7 @@ export function Modal({ onClose, children, wide, label }: { onClose: () => void;
   }, [onClose]);
   return createPortal(
     <div className="scrim" onPointerDown={(e) => e.target === e.currentTarget && onClose()}>
-      <div className={`sheet-modal grain ${wide ? "wide" : ""}`} role="dialog" aria-modal="true" aria-label={label}>
+      <div className={`sheet-modal ${wide ? "wide" : ""}`} role="dialog" aria-modal="true" aria-label={label}>
         <div>{children}</div>
       </div>
     </div>,
@@ -195,9 +195,8 @@ export function DialogHost({ children }: { children: ReactNode }) {
 /* ---------- File badges ---------- */
 
 export function FileBadge({ ext, size = "" }: { ext: string; size?: "" | "sm" }) {
-  const f = fmt(ext);
   return (
-    <span className={`ficon grain ${size}`} style={{ background: `radial-gradient(120% 120% at 85% 110%, color-mix(in srgb, ${f.color}, #ff8a4c 40%), ${f.color} 50%, color-mix(in srgb, ${f.color}, #000 45%))` }}>
+    <span className={`ficon ${size}`} style={{ "--c": fmt(ext).color } as CSSProperties}>
       <span>{ext.slice(0, 4).toUpperCase()}</span>
     </span>
   );
@@ -205,13 +204,29 @@ export function FileBadge({ ext, size = "" }: { ext: string; size?: "" | "sm" })
 
 export function ItemIcon({ item, size = "" }: { item: Item; size?: "" | "sm" }) {
   if (item.kind === "file" && item.ext) return <FileBadge ext={item.ext} size={size} />;
-  const s = size === "sm" ? 15 : 18;
-  const [bg, icon] =
-    item.kind === "note" ? ["glow-green", <StickyNote size={s} key="n" />] :
-    item.kind === "sheet" ? ["glow-green", <Sheet size={s} key="s" />] :
-    item.kind === "doc" ? ["glow-red", <FileText size={s} key="d" />] :
-    ["glow-orange", <ImageIcon size={s} key="i" />];
-  return <span className={`ficon grain ${bg} ${size}`}>{icon}</span>;
+  const [tone, icon] =
+    item.kind === "note" ? ["green", <StickyNote key="n" />] :
+    item.kind === "sheet" ? ["green", <Sheet key="s" />] :
+    item.kind === "doc" ? ["red", <FileText key="d" />] :
+    ["orange", <ImageIcon key="i" />];
+  return <span className={`ficon ${tone} ${size}`}>{icon}</span>;
+}
+
+/** Words to pick from, split by short coloured bars; the chosen one in the accent with a dot. */
+const BARS = ["var(--accent)", "#1e9e52", "#b3b3b3", "rgba(70, 211, 105, 0.8)"];
+export function Choice<T extends string>({ options, value, onChange, label }: { options: { value: T; label: ReactNode }[]; value: T; onChange: (v: T) => void; label: string }) {
+  return (
+    <div className={`choice ${options.length > 2 ? "spread" : ""}`} role="radiogroup" aria-label={label}>
+      {options.map((o, i) => (
+        <Fragment key={o.value}>
+          {i > 0 && <span className="bar" style={{ background: BARS[(i - 1) % BARS.length] }} />}
+          <button role="radio" aria-checked={o.value === value} className={o.value === value ? "on" : ""} onClick={() => onChange(o.value)}>
+            {o.label}
+          </button>
+        </Fragment>
+      ))}
+    </div>
+  );
 }
 
 export const kindLabel = (i: Item) => (i.kind === "file" ? fmt(i.ext ?? "").label : i.kind === "doc" ? "Document" : i.kind === "note" ? "Note" : "Sheet");
@@ -223,7 +238,7 @@ export function Spinner() {
 export function Empty({ icon, title, body, children, tone = "red" }: { icon: ReactNode; title: string; body?: string; children?: ReactNode; tone?: "red" | "green" | "orange" }) {
   return (
     <div className="empty enter">
-      <div className={`big grain glow-${tone}`}>{icon}</div>
+      <div className={`ficon lg ${tone}`}>{icon}</div>
       <h3 className="title">{title}</h3>
       {body && <p className="body" style={{ maxWidth: 380, margin: "6px auto 18px" }}>{body}</p>}
       {children}

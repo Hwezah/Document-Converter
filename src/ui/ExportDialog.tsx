@@ -68,7 +68,7 @@ export function ExportDialog({ item, onClose }: { item: Item; onClose: () => voi
             <Share2 size={17} /> Share
           </button>
         )}
-        <button className="btn orange grain" disabled={!!busy} onClick={() => run(false)}>
+        <button className="btn orange" disabled={!!busy} onClick={() => run(false)}>
           <Download size={17} /> Download .{sel}
         </button>
       </div>

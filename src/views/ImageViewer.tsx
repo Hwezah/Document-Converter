@@ -80,10 +80,10 @@ export function ImageViewer({ item }: { item: Item }) {
         <button className="btn sm icon ghost hide-sm" aria-label="Zoom in" onClick={() => setZoom((z) => Math.min(8, z * 1.25))}><Plus size={16} /></button>
         <button className="btn sm icon ghost" aria-label="Rotate" onClick={() => setRot((r) => (r + 90) % 360)}><RotateCw size={17} /></button>
         <button className="btn sm icon ghost" aria-label="Flip" onClick={() => setFlip((f) => !f)}><FlipHorizontal size={17} /></button>
-        {changed && <button className="btn sm green grain" disabled={busy} onClick={apply}>{busy ? <Spinner /> : <Save size={15} />} Save</button>}
+        {changed && <button className="btn sm green" disabled={busy} onClick={apply}>{busy ? <Spinner /> : <Save size={15} />} Save</button>}
         <button className="btn sm icon ghost" aria-label="Put in a document" title="Put in a new document" onClick={toDoc}><FilePlus2 size={17} /></button>
         <button className="btn sm icon ghost" aria-label="Share" onClick={async () => { const b = await getBlob(item.id); if (b) shareOrDownload(b, `${item.title}.${item.ext}`); }}><Share2 size={17} /></button>
-        <button className="btn sm orange grain" onClick={() => setExporting(true)}><Download size={15} /> <span className="hide-sm">Convert</span></button>
+        <button className="btn sm orange" onClick={() => setExporting(true)}><Download size={15} /> <span className="hide-sm">Convert</span></button>
       </div>
       <div className="img-stage" onDoubleClick={() => setZoom((z) => (z === 1 ? 2 : 1))}>
         {url && <img src={url} alt={item.title} style={{ transform: `scale(${zoom}) rotate(${rot}deg) scaleX(${flip ? -1 : 1})` }} />}
