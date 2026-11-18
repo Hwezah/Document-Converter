@@ -51,9 +51,9 @@
   --muted: #b3b3b3;
   --faint: #7a7a7a;
   --danger: #ff5a4e;
-  /* Cards: 45% from page to surface for lists, 75% for groups and tool cards. */
-  --card: #101010;
-  --card2: #141414;
+  /* Cards sit just above the page: barely lighter, so sections don't shout. */
+  --card: #0e0e0e;
+  --card2: #101010;
   --plain: rgba(255, 255, 255, 0.09);
   --plain-down: rgba(255, 255, 255, 0.18);
   --frost: rgba(10, 10, 10, 0.82);
@@ -74,8 +74,8 @@
   --danger: #d32f2f;
   --good: #1e8e3e;
   --warn: #b26a00;
-  --card: #fbf9f7;
-  --card2: #ffffff;
+  --card: #f3eeea;
+  --card2: #f2ede8;
   --plain: rgba(20, 20, 20, 0.07);
   --plain-down: rgba(20, 20, 20, 0.14);
   --frost: rgba(246, 242, 238, 0.84);
@@ -616,3 +616,7 @@ a { color: inherit; }
 .update-strip { display: flex; align-items: center; gap: 10px; padding: 8px 10px 8px 16px; z-index: 20; font-size: 13.5px; animation: rise .3s var(--spring); }
 .update-strip .udot { width: 8px; height: 8px; border-radius: 50%; background: var(--good); flex: none; }
 .update-strip .meta { font-size: 13px; }
+
+/* Full screen in the Android app: the bottom nav sits on the screen's edge. */
+:root.android .tabbar { padding-bottom: 0; }
+:root.android .tabbar button { padding-bottom: 12px; }
