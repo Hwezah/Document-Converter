@@ -1,10 +1,10 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
-import { ArrowLeftRight, FilePlus2, FolderOpen, Home as HomeIcon, Library, Plus, Settings as Gear, Sheet, StickyNote, Wrench, Upload } from "lucide-react";
+import { ArrowLeftRight, FilePlus2, FolderOpen, Home as HomeIcon, Library, Plus, Settings as Gear, Sheet, StickyNote, Wrench, Upload, X } from "lucide-react";
 import { create, getItem, load, patch, useItems, type Item } from "./lib/store";
 import { ACCEPT, baseName, extOf } from "./lib/formats";
 import { importFile } from "./lib/importers";
 import { fromBase64, native } from "./lib/native";
-import { useMenu, useToast } from "./ui/kit";
+import { Spinner, useMenu, useToast } from "./ui/kit";
 import { Home } from "./views/Home";
 import { Files } from "./views/Files";
 import { Notes } from "./views/Notes";
@@ -54,6 +54,8 @@ export function App() {
   const [openId, setOpenId] = useState<string | null>(null);
   const [loaded, setLoaded] = useState(false);
   const [dragging, setDragging] = useState(false);
+  const [update, setUpdate] = useState<{ state: "downloading" | "ready"; name: string; summary: string } | null>(null);
+  const [hideUpdate, setHideUpdate] = useState(false);
   const convertQueue = useRef<File[]>([]);
   const picker = useRef<HTMLInputElement>(null);
 
@@ -171,7 +173,15 @@ export function App() {
       }
       // Inside the Android app: files from "Open with" / "Share to Folio" arrive through these.
       if (native) {
-        const w = window as unknown as { folioReceive?: unknown; folioReceiveText?: unknown };
+        const w = window as unknown as { folioReceive?: unknown; folioReceiveText?: unknown; folioUpdate?: unknown };
+        // The app found a new build: show the strip (and again if it was hidden for an older one).
+        w.folioUpdate = (u: { state: string; name: string; summary: string }) => {
+          if (u.state === "none") return setUpdate(null);
+          setUpdate((prev) => {
+            if (prev?.name !== u.name || u.state === "ready") setHideUpdate(false);
+            return u as { state: "downloading" | "ready"; name: string; summary: string };
+          });
+        };
         w.folioReceive = (list: { name: string; type: string; data: string }[]) => openFiles(list.map((f) => fromBase64(f.data, f.name, f.type)));
         w.folioReceiveText = async (text: string) => {
           const it = await create({ kind: "note", title: "Shared", html: `<p>${text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/\n/g, "<br>")}</p>`, tint: "orange" });
@@ -309,7 +319,20 @@ export function App() {
           </p>
         </nav>
 
-        <main className="main">{content}</main>
+        <main className="main">
+          {update && !hideUpdate && (
+            <div className="update-strip glass" role="status">
+              {update.state === "downloading" ? <Spinner /> : <span className="udot" />}
+              <span className="grow clip">
+                <b>{update.state === "ready" ? "Update ready" : "Downloading update…"}</b>
+                <span className="meta"> · {update.name}{update.summary ? ` — ${update.summary}` : ""}</span>
+              </span>
+              {update.state === "ready" && <button className="btn sm red" onClick={() => native?.installUpdate()}>Install</button>}
+              <button className="btn sm icon ghost" aria-label="Hide" onClick={() => setHideUpdate(true)}><X size={16} /></button>
+            </div>
+          )}
+          {content}
+        </main>
 
         {!openItem && (
           <nav className="tabbar" aria-label="Main">

@@ -74,7 +74,7 @@ class MainActivity : AppCompatActivity() {
     @SuppressLint("SetJavaScriptEnabled")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        updater = Updater(this)
+        updater = Updater(this) { state -> deliver("window.folioUpdate && window.folioUpdate($state)") }
         // Draw edge to edge, then keep the page clear of the status bar, notch, navigation bar and keyboard.
         WindowCompat.setDecorFitsSystemWindows(window, false)
         val loader = WebViewAssetLoader.Builder()
@@ -155,10 +155,25 @@ class MainActivity : AppCompatActivity() {
         handleIntent(intent)
     }
 
+    /** While Folio is open it keeps looking for a new build, every few minutes. */
+    private val ticker = android.os.Handler(android.os.Looper.getMainLooper())
+    private val tick = object : Runnable {
+        override fun run() {
+            updater.check()
+            ticker.postDelayed(this, 5 * 60_000L)
+        }
+    }
+
     override fun onResume() {
         super.onResume()
         updater.resume()
-        updater.check()
+        ticker.removeCallbacks(tick)
+        ticker.post(tick)
+    }
+
+    override fun onPause() {
+        super.onPause()
+        ticker.removeCallbacks(tick)
     }
 
     /** Status and navigation bars in the page's colour, with icons that read on it. */
@@ -244,6 +259,7 @@ class MainActivity : AppCompatActivity() {
         @JavascriptInterface
         fun ready() = runOnUiThread {
             pageReady = true
+            updater.state?.let { pending += "window.folioUpdate && window.folioUpdate($it)" }
             pending.forEach { web.evaluateJavascript(it, null) }
             pending.clear()
         }
@@ -253,6 +269,9 @@ class MainActivity : AppCompatActivity() {
 
         @JavascriptInterface
         fun checkForUpdate() = updater.check(manual = true)
+
+        @JavascriptInterface
+        fun installUpdate() = runOnUiThread { updater.installReady() }
 
         @JavascriptInterface
         fun setDark(dark: Boolean) = runOnUiThread { this@MainActivity.setDark(dark) }

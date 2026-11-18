@@ -106,7 +106,7 @@ export function Settings() {
           )}
         </Row>
         {native && (
-          <Row icon={<RefreshCw size={16} />} title="Updates" body={`Version ${native.version()}. Folio checks for a new build each time it opens and offers to install it.`}>
+          <Row icon={<RefreshCw size={16} />} title="Updates" body={`Version ${native.version()}. Folio looks for a new build when it opens and every few minutes while it is open, then shows a strip at the top to install it.`}>
             <button className="btn sm" onClick={() => (native!.checkForUpdate(), toast("Checking for updates…", "info"))}>Check now</button>
           </Row>
         )}

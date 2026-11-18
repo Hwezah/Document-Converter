@@ -1,7 +1,6 @@
 package com.hwezah.folio
 
 import android.app.Activity
-import android.app.AlertDialog
 import android.content.Intent
 import android.net.Uri
 import android.provider.Settings
@@ -17,13 +16,23 @@ import java.net.URL
  * on the "folio-latest" release. On each open (at most every 15 minutes) this reads version.json; when
  * its build is newer than this one, it downloads the APK in the background and offers to install it.
  */
-class Updater(private val activity: Activity) {
+class Updater(private val activity: Activity, private val onState: (JSONObject) -> Unit) {
     private val base = "https://github.com/Hwezah/Document-Converter/releases/download/folio-latest"
     private val dir = File(activity.cacheDir, "updates").apply { mkdirs() }
     private var lastCheck = 0L
     private var busy = false
     /** An APK downloaded and waiting for the user to allow installs from Folio. */
     private var waiting: File? = null
+    /** The newest build downloaded and ready, and what the page was last told. */
+    private var ready: File? = null
+    var state: JSONObject? = null
+        private set
+
+    private fun tell(s: String, name: String = "", summary: String = "") {
+        val j = JSONObject().put("state", s).put("name", name).put("summary", summary)
+        state = if (s == "none") null else j
+        activity.runOnUiThread { onState(j) }
+    }
 
     val currentCode: Long
         get() = activity.packageManager.getPackageInfo(activity.packageName, 0).longVersionCode
@@ -33,7 +42,7 @@ class Updater(private val activity: Activity) {
 
     fun check(manual: Boolean = false) {
         val now = System.currentTimeMillis()
-        if (busy || (!manual && now - lastCheck < 15 * 60_000)) return
+        if (busy || (!manual && now - lastCheck < 4 * 60_000)) return
         lastCheck = now
         busy = true
         Thread {
@@ -42,19 +51,24 @@ class Updater(private val activity: Activity) {
                 val code = info.getLong("versionCode")
                 if (code <= currentCode) {
                     if (manual) toast("Folio is up to date")
+                    if (state != null) tell("none")
                     dir.listFiles()?.forEach { it.delete() }
                     return@Thread
                 }
                 val apk = File(dir, "Folio-$code.apk")
+                val name = info.optString("versionName", "build $code")
+                val summary = info.optString("summary")
                 if (!apk.exists() || apk.length() != info.optLong("size", -1)) {
-                    if (manual) toast("Downloading the update…")
+                    tell("downloading", name, summary)
                     val tmp = File(dir, "download.tmp")
                     tmp.writeBytes(get("$base/Folio.apk"))
                     tmp.renameTo(apk)
                 }
-                activity.runOnUiThread { offer(apk, info.optString("versionName", "build $code"), info.optString("summary")) }
+                ready = apk
+                tell("ready", name, summary)
             } catch (e: Exception) {
                 if (manual) toast("Couldn't check for updates: ${e.message}")
+                if (state?.optString("state") == "downloading") tell("none")
             } finally {
                 busy = false
             }
@@ -70,14 +84,10 @@ class Updater(private val activity: Activity) {
         }
     }
 
-    private fun offer(apk: File, name: String, summary: String) {
-        if (activity.isFinishing) return
-        AlertDialog.Builder(activity)
-            .setTitle("Update ready")
-            .setMessage("Folio $name is downloaded." + (if (summary.isNotBlank()) "\n\n$summary" else "") + "\n\nYour documents stay as they are.")
-            .setPositiveButton("Install") { _, _ -> install(apk) }
-            .setNegativeButton("Later", null)
-            .show()
+    /** The strip's Install button. */
+    fun installReady() {
+        val apk = ready ?: return check(manual = true)
+        install(apk)
     }
 
     private fun install(apk: File) {

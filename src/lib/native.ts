@@ -5,6 +5,7 @@ interface Bridge {
   share(name: string, mime: string, base64: string): void;
   version(): string;
   checkForUpdate(): void;
+  installUpdate(): void;
   setDark?(dark: boolean): void;
 }
 
