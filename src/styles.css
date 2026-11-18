@@ -180,23 +180,24 @@ a { color: inherit; }
   .shell { grid-template-columns: 1fr; }
   .rail { display: none; }
   .page { padding: 18px var(--edge) 120px; }
+  /* Flat, docked to the bottom edge: icon over label, the current tab bold with a short bar above it. */
   .tabbar {
-    display: flex; position: fixed; left: 10px; right: 10px; bottom: calc(10px + env(safe-area-inset-bottom));
-    z-index: 30; border-radius: 22px; padding: 6px; justify-content: space-around;
-    box-shadow: inset 0 1px 0 var(--rim-hi), 0 0 0 1px var(--rim-lo), var(--shadow);
+    display: flex; position: fixed; left: 0; right: 0; bottom: 0; z-index: 30;
+    padding: 0 4px env(safe-area-inset-bottom); background: var(--bg);
+    border-top: 1px solid var(--rim-lo);
   }
   .tabbar button {
-    flex: 1; display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 8px 0 6px;
-    background: none; border: 0; color: var(--faint); font-size: 11px; font-weight: 600; border-radius: 16px;
-    transition: color 0.18s, background 0.18s, transform 0.12s;
+    position: relative; flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px;
+    padding: 12px 0 10px; background: none; border: 0; color: var(--faint);
+    font-size: 12.5px; font-weight: 500; letter-spacing: .1px; transition: color 0.18s;
   }
-  .tabbar button:active { transform: scale(0.94); }
-  .tabbar button.on { color: var(--text); background: var(--tint); }
-  .tabbar button.on svg { color: var(--ember); }
-  .tabbar .fab {
-    background: radial-gradient(120% 120% at 85% 110%, #e35e3c, #b81d24 48%, #651014) !important;
-    flex: 0 0 52px; height: 52px; margin: 0 4px; align-self: center; border-radius: 18px; color: #fff;
-    justify-content: center; box-shadow: inset 0 1px 0 rgba(255,255,255,.25), 0 6px 18px -4px rgba(184,29,36,.6);
+  .tabbar button svg { width: 25px; height: 25px; stroke-width: 1.8; }
+  .tabbar button:active svg { transform: scale(0.9); }
+  .tabbar button.on { color: var(--text); font-weight: 700; }
+  .tabbar button.on svg { stroke-width: 2.2; }
+  .tabbar button.on::before {
+    content: ""; position: absolute; top: 0; left: 50%; width: 30px; height: 3px; margin-left: -15px;
+    border-radius: 0 0 3px 3px; background: linear-gradient(90deg, var(--red), var(--ember));
   }
   .hero { font-size: 28px; line-height: 32px; }
   .display { font-size: 24px; line-height: 30px; }

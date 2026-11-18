@@ -312,13 +312,12 @@ export function App() {
         <main className="main">{content}</main>
 
         {!openItem && (
-          <nav className="tabbar glass grain" aria-label="Main">
-            {NAV.slice(0, 2).map((n) => (
-              <button key={n.id} className={view === n.id ? "on" : ""} onClick={() => go(n.id)}>{n.icon}{n.label}</button>
-            ))}
-            <button className="fab glow-red grain" onClick={createMenu} aria-label="New"><Plus size={24} /></button>
-            {NAV.slice(2, 4).map((n) => (
-              <button key={n.id} className={view === n.id ? "on" : ""} onClick={() => go(n.id)}>{n.icon}{n.label}</button>
+          <nav className="tabbar" aria-label="Main">
+            {NAV.filter((n) => n.id !== "tools").map((n) => (
+              <button key={n.id} className={view === n.id ? "on" : ""} aria-current={view === n.id ? "page" : undefined} onClick={() => go(n.id)}>
+                {n.icon}
+                {n.label}
+              </button>
             ))}
           </nav>
         )}
