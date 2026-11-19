@@ -375,8 +375,10 @@ a { color: inherit; }
 .note .content input { accent-color: var(--accent); }
 .note .foot { display: flex; align-items: center; gap: 6px; margin-top: 8px; }
 .note .pinned { position: absolute; top: 12px; right: 12px; color: var(--accent); }
-.capture { max-width: 640px; margin: 0 auto 22px; border-radius: var(--radius-card); padding: 6px; background-color: var(--card); }
+.capture { max-width: 640px; margin: 24px 0 0; border-radius: var(--radius-card); padding: 6px; background-color: var(--card); }
 .capture input { background: none; border: 0; outline: 0; width: 100%; padding: 12px; font-size: 16px; }
+/* Search and colour filters: their own block, apart from the note box. */
+.note-find { max-width: 640px; margin: 28px 0 22px; display: grid; gap: 14px; }
 .swatches { display: flex; gap: 8px; align-items: center; }
 .swatch { width: 24px; height: 24px; border-radius: 50%; border: 0; padding: 0; display: grid; place-items: center; transition: transform .15s var(--spring); }
 .swatch.on { transform: scale(1.3); }

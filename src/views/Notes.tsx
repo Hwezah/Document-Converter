@@ -68,37 +68,37 @@ export function Notes() {
 
   return (
     <>
-      <div className="row between wrap">
-        <div>
-          <div className="overline">Notes</div>
-          <h1 className="display" style={{ marginTop: 4 }}>Jot it down</h1>
-        </div>
-        <div className="search" style={{ width: "min(320px, 100%)" }}>
-          <Search size={17} />
-          <input className="input" placeholder="Search notes" value={q} onChange={(e) => setQ(e.target.value)} />
-        </div>
-      </div>
+      <div className="overline">Notes</div>
+      <h1 className="display" style={{ marginTop: 4 }}>Jot it down</h1>
 
-      <form className="capture mt-lg row" onSubmit={(e) => (e.preventDefault(), quickAdd())}>
+      <form className="capture row" onSubmit={(e) => (e.preventDefault(), quickAdd())}>
         <StickyNote size={19} style={{ marginLeft: 10, color: "var(--green)", flex: "none" }} />
         <input placeholder="Take a note…" value={capture} onChange={(e) => setCapture(e.target.value)} aria-label="Take a note" />
         <button type="button" className="btn sm icon ghost" title="New checklist (comma-separated items)" aria-label="New checklist" onClick={() => quickAdd(true)}><ListChecks size={18} /></button>
         <button type="submit" className="btn sm green" aria-label="Add note"><Plus size={16} /> Add</button>
       </form>
 
-      <div className="row wrap" style={{ justifyContent: "center", marginBottom: 24, gap: 14 }}>
-        <div className="swatches" role="group" aria-label="Filter by colour">
-          <button className={`chip ${tint === "all" ? "on" : ""}`} style={{ height: 26 }} onClick={() => setTint("all")}>All</button>
-          {TINTS.map((t) => (
-            <button key={String(t.id)} className={`swatch ${tint === t.id ? "on" : ""}`} style={{ background: t.color }} title={t.label} aria-label={t.label} onClick={() => setTint(tint === t.id ? "all" : t.id)} />
-          ))}
-        </div>
-        {tags.length > 0 && (
-          <div className="chips">
-            {tags.map((t) => <button key={t} className={`chip ${tag === t ? "on" : ""}`} style={{ height: 26 }} onClick={() => setTag(tag === t ? null : t)}>#{t}</button>)}
+      {notes.length > 0 && (
+        <div className="note-find">
+          <div className="search">
+            <Search size={17} />
+            <input className="input" placeholder="Search notes" value={q} onChange={(e) => setQ(e.target.value)} />
           </div>
-        )}
-      </div>
+          <div className="row wrap" style={{ gap: 14 }}>
+            <div className="swatches" role="group" aria-label="Filter by colour">
+              <button className={`chip ${tint === "all" ? "on" : ""}`} style={{ height: 26 }} onClick={() => setTint("all")}>All</button>
+              {TINTS.map((t) => (
+                <button key={String(t.id)} className={`swatch ${tint === t.id ? "on" : ""}`} style={{ background: t.color }} title={t.label} aria-label={t.label} onClick={() => setTint(tint === t.id ? "all" : t.id)} />
+              ))}
+            </div>
+            {tags.length > 0 && (
+              <div className="chips">
+                {tags.map((t) => <button key={t} className={`chip ${tag === t ? "on" : ""}`} style={{ height: 26 }} onClick={() => setTag(tag === t ? null : t)}>#{t}</button>)}
+              </div>
+            )}
+          </div>
+        </div>
+      )}
 
       {!shown.length ? (
         <Empty icon={<StickyNote size={28} />} tone="green" title={notes.length ? "No notes match" : "Your notes live here"} body={notes.length ? "Try another word or colour." : "Type above and press Enter. Checklists, colours, pins and tags make them easy to find again."} />
