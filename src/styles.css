@@ -57,7 +57,6 @@
   --plain: rgba(255, 255, 255, 0.09);
   --plain-down: rgba(255, 255, 255, 0.18);
   --frost: rgba(10, 10, 10, 0.82);
-  --dock: rgba(38, 38, 38, 0.86);
   --scrim: rgba(0, 0, 0, 0.62);
   --paper: #141414;
   --paper-text: #ececec;
@@ -80,7 +79,6 @@
   --plain: rgba(20, 20, 20, 0.07);
   --plain-down: rgba(20, 20, 20, 0.14);
   --frost: rgba(246, 242, 238, 0.84);
-  --dock: rgba(232, 226, 220, 0.88);
   --scrim: rgba(20, 14, 10, 0.38);
   --paper: #ffffff;
   --paper-text: #1a1a1a;
@@ -163,21 +161,26 @@ a { color: inherit; }
 @media (max-width: 860px) {
   .shell { grid-template-columns: 1fr; }
   .rail { display: none; }
-  .page { padding: 18px var(--edge) 170px; }
-  /* A floating frosted dock: two rows of four icons; the current place sits on a soft pill. */
+  .page { padding: 18px var(--edge) 140px; }
+  /* A floating frosted dock in the update strip's colour: two rows of four icons split by a faint
+     hairline; the current place sits on a small, quiet pill. */
   .tabbar {
-    display: grid; gap: 4px; position: fixed; z-index: 30;
-    left: 12px; right: 12px; bottom: calc(12px + env(safe-area-inset-bottom));
-    padding: 8px; border-radius: 28px; background-color: var(--dock);
+    display: grid; position: fixed; z-index: 30;
+    left: 14px; right: 14px; bottom: calc(10px + env(safe-area-inset-bottom));
+    padding: 4px 6px; border-radius: 24px; background-color: var(--frost);
   }
-  .tabrow { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
+  .tabrow { position: relative; display: grid; grid-template-columns: repeat(4, 1fr); justify-items: center; padding: 5px 0; }
+  .tabrow + .tabrow::before {
+    content: ""; position: absolute; top: 0; left: 5%; right: 5%; height: 1px;
+    background: color-mix(in srgb, var(--text) 9%, transparent);
+  }
   .tabbar button {
-    height: 50px; display: grid; place-items: center; border: 0; border-radius: 20px;
+    width: 56px; height: 38px; display: grid; place-items: center; border: 0; border-radius: 14px;
     background: none; color: var(--faint); transition: background-color .18s, color .18s;
   }
-  .tabbar button svg { width: 24px; height: 24px; stroke-width: 1.8; transition: transform .12s var(--ease); }
+  .tabbar button svg { width: 22px; height: 22px; stroke-width: 1.8; transition: transform .12s var(--ease); }
   .tabbar button:active svg { transform: scale(0.88); }
-  .tabbar button.on { color: var(--text); background-color: var(--plain); }
+  .tabbar button.on { color: var(--text); background-color: color-mix(in srgb, var(--text) 7%, transparent); }
   .tabbar button.on svg { stroke-width: 2.2; }
   .hero { font-size: 28px; line-height: 32px; }
   .display { font-size: 24px; line-height: 30px; }
@@ -533,7 +536,7 @@ a { color: inherit; }
 .menu .lbl { padding: 6px 11px 3px; }
 
 .toasts { position: fixed; z-index: 80; left: 50%; transform: translateX(-50%); bottom: calc(24px + env(safe-area-inset-bottom)); display: flex; flex-direction: column; gap: 8px; align-items: center; pointer-events: none; }
-@media (max-width: 860px) { .toasts { bottom: calc(150px + env(safe-area-inset-bottom)); } }
+@media (max-width: 860px) { .toasts { bottom: calc(124px + env(safe-area-inset-bottom)); } }
 .toast {
   pointer-events: auto; display: flex; align-items: center; gap: 10px; padding: 11px 16px; border-radius: 14px; font-weight: 600; font-size: 14px; max-width: 92vw;
   animation: rise .3s var(--spring); background-color: color-mix(in srgb, var(--surface2) 94%, transparent); -webkit-backdrop-filter: blur(24px); backdrop-filter: blur(24px);
@@ -623,4 +626,4 @@ a { color: inherit; }
 .update-strip .meta { font-size: 13px; }
 
 /* Full screen in the Android app: no system bar under the dock. */
-:root.android .tabbar { bottom: 12px; }
+:root.android .tabbar { bottom: 10px; }
