@@ -1,5 +1,5 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
-import { ArrowLeftRight, FilePlus2, FolderOpen, Home as HomeIcon, Library, Plus, Settings as Gear, Sheet, StickyNote, Wrench, Upload, X } from "lucide-react";
+import { ArrowLeftRight, FilePlus2, FolderOpen, Home as HomeIcon, Library, Plus, Settings as Gear, Sheet, StickyNote, Layers, Upload, X } from "lucide-react";
 import { create, getItem, load, patch, useItems, type Item } from "./lib/store";
 import { ACCEPT, baseName, extOf } from "./lib/formats";
 import { importFile } from "./lib/importers";
@@ -42,7 +42,7 @@ const NAV: { id: View; label: string; icon: ReactNode }[] = [
   { id: "files", label: "Library", icon: <Library size={19} /> },
   { id: "notes", label: "Notes", icon: <StickyNote size={19} /> },
   { id: "convert", label: "Convert", icon: <ArrowLeftRight size={19} /> },
-  { id: "tools", label: "PDF tools", icon: <Wrench size={19} /> },
+  { id: "tools", label: "PDF tools", icon: <Layers size={19} /> },
   { id: "settings", label: "Settings", icon: <Gear size={19} /> },
 ];
 
@@ -349,7 +349,7 @@ export function App() {
                   <>
                     <button aria-label="New" title="New" onClick={createMenu}><FilePlus2 /></button>
                     <button aria-label="Open a file" title="Open a file" onClick={pickFiles}><FolderOpen /></button>
-                    <button className={view === "tools" ? "on" : ""} aria-label="PDF tools" title="PDF tools" aria-current={view === "tools" ? "page" : undefined} onClick={() => go("tools")}><Wrench /></button>
+                    <button className={view === "tools" ? "on" : ""} aria-label="PDF tools" title="PDF tools" aria-current={view === "tools" ? "page" : undefined} onClick={() => go("tools")}><Layers /></button>
                     <button className={view === "settings" ? "on" : ""} aria-label="Settings" title="Settings" aria-current={view === "settings" ? "page" : undefined} onClick={() => go("settings")}><Gear /></button>
                   </>
                 )}
