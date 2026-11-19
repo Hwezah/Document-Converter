@@ -214,24 +214,22 @@ export function Convert() {
       )}
 
       <div className="section-head"><h2 className="title">What converts to what</h2></div>
-      <div className="card" style={{ overflowX: "auto" }}>
-        <table className="matrix">
-          <thead><tr><th>From</th><th>To</th></tr></thead>
-          <tbody>
-            {[
-              ["Word, OpenDocument, RTF, Markdown, text, web pages, eBooks", "docx"],
-              ["PDF", "pdf"],
-              ["PowerPoint (text)", "pptx"],
-              ["Excel, Calc, CSV, TSV, JSON", "xlsx"],
-              ["Pictures (PNG, JPEG, WebP, GIF, BMP, SVG)", "png"],
-            ].map(([label, ext]) => (
-              <tr key={ext}>
-                <td style={{ whiteSpace: "nowrap" }}><b>{label}</b></td>
-                <td>{targetsFor(ext).map((t) => <span key={t} className="badge">.{t}</span>)}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+      <div className="fmap">
+        {[
+          ["Documents", "Word, OpenDocument, RTF, Markdown, text, web pages, eBooks", "docx"],
+          ["PDF", "Any PDF, text rebuilt as editable", "pdf"],
+          ["Slides", "PowerPoint (text only)", "pptx"],
+          ["Spreadsheets", "Excel, Calc, CSV, TSV, JSON", "xlsx"],
+          ["Pictures", "PNG, JPEG, WebP, GIF, BMP, SVG", "bmp"],
+        ].map(([name, from, ext]) => (
+          <div key={ext} className="card fmap-group">
+            <div className="fmap-name">{name}</div>
+            <div className="fmap-from">{from}</div>
+            <div className="fmap-to">
+              {(ext === "docx" ? ["docx", ...targetsFor(ext)] : targetsFor(ext)).map((t) => <span key={t} className="badge">.{t}</span>)}
+            </div>
+          </div>
+        ))}
       </div>
     </>
   );
