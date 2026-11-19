@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { ArrowLeftRight, ArrowRight, FilePlus2, FolderOpen, Settings as Gear, StickyNote, Upload, Wrench, Sheet as SheetIcon, ScanLine } from "lucide-react";
+import { ArrowLeftRight, ArrowRight, FilePlus2, FolderOpen, StickyNote, Upload, Wrench, Sheet as SheetIcon, ScanLine } from "lucide-react";
 import { useApp } from "../app";
 import { useItems, type Item } from "../lib/store";
 import { DocCard, useItemActions } from "../ui/Cards";
@@ -37,10 +37,6 @@ export function Home() {
           <div className="overline">{new Date().toLocaleDateString(undefined, { weekday: "long", day: "numeric", month: "long" })}</div>
           <h1 className="hero" style={{ marginTop: 6 }}>{greeting()}.</h1>
           <p className="body" style={{ margin: "6px 0 0" }}>Open, write, convert. Everything stays on this device.</p>
-        </div>
-        <div className="row">
-          <button className="btn icon" aria-label="PDF tools" onClick={() => app.go("tools")} title="PDF tools"><Wrench size={18} /></button>
-          <button className="btn icon" aria-label="Settings" onClick={() => app.go("settings")} title="Settings"><Gear size={18} /></button>
         </div>
       </div>
 

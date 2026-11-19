@@ -57,6 +57,7 @@
   --plain: rgba(255, 255, 255, 0.09);
   --plain-down: rgba(255, 255, 255, 0.18);
   --frost: rgba(10, 10, 10, 0.82);
+  --dock: rgba(38, 38, 38, 0.86);
   --scrim: rgba(0, 0, 0, 0.62);
   --paper: #141414;
   --paper-text: #ececec;
@@ -79,6 +80,7 @@
   --plain: rgba(20, 20, 20, 0.07);
   --plain-down: rgba(20, 20, 20, 0.14);
   --frost: rgba(246, 242, 238, 0.84);
+  --dock: rgba(232, 226, 220, 0.88);
   --scrim: rgba(20, 14, 10, 0.38);
   --paper: #ffffff;
   --paper-text: #1a1a1a;
@@ -116,8 +118,8 @@ a { color: inherit; }
 /* Bars and overlays: see-through and blurred. */
 .glass {
   background-color: var(--frost);
-  backdrop-filter: blur(24px) saturate(1.4);
   -webkit-backdrop-filter: blur(24px) saturate(1.4);
+  backdrop-filter: blur(24px) saturate(1.4);
 }
 /* Flat punchy fills. */
 .fill { color: #fff; }
@@ -161,25 +163,22 @@ a { color: inherit; }
 @media (max-width: 860px) {
   .shell { grid-template-columns: 1fr; }
   .rail { display: none; }
-  .page { padding: 18px var(--edge) 110px; }
-  /* Flat, docked to the bottom edge: icon over label, the current tab bold with a short bar above it. */
+  .page { padding: 18px var(--edge) 170px; }
+  /* A floating frosted dock: two rows of four icons; the current place sits on a soft pill. */
   .tabbar {
-    display: flex; position: fixed; left: 0; right: 0; bottom: 0; z-index: 30;
-    padding: 0 4px env(safe-area-inset-bottom); background: var(--bg);
+    display: grid; gap: 4px; position: fixed; z-index: 30;
+    left: 12px; right: 12px; bottom: calc(12px + env(safe-area-inset-bottom));
+    padding: 8px; border-radius: 28px; background-color: var(--dock);
   }
+  .tabrow { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
   .tabbar button {
-    position: relative; flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px;
-    padding: 12px 0 10px; background: none; border: 0; color: var(--faint);
-    font-size: 12.5px; font-weight: 500; letter-spacing: .1px; transition: color 0.18s;
+    height: 50px; display: grid; place-items: center; border: 0; border-radius: 20px;
+    background: none; color: var(--faint); transition: background-color .18s, color .18s;
   }
-  .tabbar button svg { width: 25px; height: 25px; stroke-width: 1.8; }
-  .tabbar button:active svg { transform: scale(0.9); }
-  .tabbar button.on { color: var(--text); font-weight: 700; }
+  .tabbar button svg { width: 24px; height: 24px; stroke-width: 1.8; transition: transform .12s var(--ease); }
+  .tabbar button:active svg { transform: scale(0.88); }
+  .tabbar button.on { color: var(--text); background-color: var(--plain); }
   .tabbar button.on svg { stroke-width: 2.2; }
-  .tabbar button.on::before {
-    content: ""; position: absolute; top: 0; left: 50%; width: 30px; height: 3px; margin-left: -15px;
-    border-radius: 0 0 3px 3px; background: var(--accent);
-  }
   .hero { font-size: 28px; line-height: 32px; }
   .display { font-size: 24px; line-height: 30px; }
 }
@@ -513,7 +512,7 @@ a { color: inherit; }
 .scrim { position: fixed; inset: 0; background: var(--scrim); z-index: 50; display: grid; place-items: center; padding: 16px; animation: fade .18s var(--ease); }
 .sheet-modal {
   width: min(560px, 100%); max-height: min(86vh, 900px); overflow: auto; border-radius: 24px; padding: 22px;
-  background-color: color-mix(in srgb, var(--surface) 92%, transparent); backdrop-filter: blur(30px) saturate(1.4); -webkit-backdrop-filter: blur(30px) saturate(1.4);
+  background-color: color-mix(in srgb, var(--surface) 92%, transparent); -webkit-backdrop-filter: blur(30px) saturate(1.4); backdrop-filter: blur(30px) saturate(1.4);
   animation: rise .28s var(--spring);
 }
 .sheet-modal.wide { width: min(880px, 100%); }
@@ -525,7 +524,7 @@ a { color: inherit; }
 }
 .menu {
   position: fixed; z-index: 60; min-width: 210px; padding: 6px; border-radius: 16px; animation: pop .16s var(--ease);
-  background-color: color-mix(in srgb, var(--surface2) 94%, transparent); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);
+  background-color: color-mix(in srgb, var(--surface2) 94%, transparent); -webkit-backdrop-filter: blur(24px); backdrop-filter: blur(24px);
 }
 .menu button { display: flex; width: 100%; align-items: center; gap: 10px; padding: 9px 11px; border: 0; background: none; border-radius: 10px; text-align: left; font-size: 14px; font-weight: 500; }
 .menu button:hover, .menu button:active { background: var(--plain); }
@@ -534,10 +533,10 @@ a { color: inherit; }
 .menu .lbl { padding: 6px 11px 3px; }
 
 .toasts { position: fixed; z-index: 80; left: 50%; transform: translateX(-50%); bottom: calc(24px + env(safe-area-inset-bottom)); display: flex; flex-direction: column; gap: 8px; align-items: center; pointer-events: none; }
-@media (max-width: 860px) { .toasts { bottom: calc(86px + env(safe-area-inset-bottom)); } }
+@media (max-width: 860px) { .toasts { bottom: calc(150px + env(safe-area-inset-bottom)); } }
 .toast {
   pointer-events: auto; display: flex; align-items: center; gap: 10px; padding: 11px 16px; border-radius: 14px; font-weight: 600; font-size: 14px; max-width: 92vw;
-  animation: rise .3s var(--spring); background-color: color-mix(in srgb, var(--surface2) 94%, transparent); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);
+  animation: rise .3s var(--spring); background-color: color-mix(in srgb, var(--surface2) 94%, transparent); -webkit-backdrop-filter: blur(24px); backdrop-filter: blur(24px);
 }
 .toast .tdot { width: 8px; height: 8px; border-radius: 50%; flex: none; }
 .toast button { background: none; border: 0; color: var(--orange); font-weight: 700; padding: 0 0 0 6px; }
@@ -623,6 +622,5 @@ a { color: inherit; }
 .update-strip .udot { width: 8px; height: 8px; border-radius: 50%; background: var(--good); flex: none; }
 .update-strip .meta { font-size: 13px; }
 
-/* Full screen in the Android app: the bottom nav sits on the screen's edge. */
-:root.android .tabbar { padding-bottom: 0; }
-:root.android .tabbar button { padding-bottom: 12px; }
+/* Full screen in the Android app: no system bar under the dock. */
+:root.android .tabbar { bottom: 12px; }

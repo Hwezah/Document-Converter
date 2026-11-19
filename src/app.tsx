@@ -335,12 +335,25 @@ export function App() {
         </main>
 
         {!openItem && (
-          <nav className="tabbar" aria-label="Main">
-            {NAV.filter((n) => n.id !== "tools").map((n) => (
-              <button key={n.id} className={view === n.id ? "on" : ""} aria-current={view === n.id ? "page" : undefined} onClick={() => go(n.id)}>
-                {n.icon}
-                {n.label}
-              </button>
+          <nav className="tabbar glass" aria-label="Main">
+            {/* Top row: the places. Bottom row: making, opening, tools and settings. */}
+            {[NAV.filter((n) => ["home", "files", "notes", "convert"].includes(n.id)), null].map((row, r) => (
+              <div className="tabrow" key={r}>
+                {row ? (
+                  row.map((n) => (
+                    <button key={n.id} className={view === n.id ? "on" : ""} aria-label={n.label} title={n.label} aria-current={view === n.id ? "page" : undefined} onClick={() => go(n.id)}>
+                      {n.icon}
+                    </button>
+                  ))
+                ) : (
+                  <>
+                    <button aria-label="New" title="New" onClick={createMenu}><FilePlus2 /></button>
+                    <button aria-label="Open a file" title="Open a file" onClick={pickFiles}><FolderOpen /></button>
+                    <button className={view === "tools" ? "on" : ""} aria-label="PDF tools" title="PDF tools" aria-current={view === "tools" ? "page" : undefined} onClick={() => go("tools")}><Wrench /></button>
+                    <button className={view === "settings" ? "on" : ""} aria-label="Settings" title="Settings" aria-current={view === "settings" ? "page" : undefined} onClick={() => go("settings")}><Gear /></button>
+                  </>
+                )}
+              </div>
             ))}
           </nav>
         )}
