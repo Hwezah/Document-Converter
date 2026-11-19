@@ -90,6 +90,9 @@ class MainActivity : AppCompatActivity() {
             settings.allowContentAccess = true
             settings.mediaPlaybackRequiresUserGesture = true
             settings.textZoom = 100
+            // The page scrolls its own panes; never draw the WebView's scrollbars.
+            isVerticalScrollBarEnabled = false
+            isHorizontalScrollBarEnabled = false
             addJavascriptInterface(Bridge(), "FolioAndroid")
             webViewClient = object : WebViewClient() {
                 override fun shouldInterceptRequest(view: WebView, request: WebResourceRequest): WebResourceResponse? =
